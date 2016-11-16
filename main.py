@@ -8,7 +8,7 @@ class Board:
         self.black = "B"
         self.white = "W"
         self.empty = "_"
-        self.board = [self.empty for i in range(64)]
+        self.board = [self.empty for i in range(64)] #middle
         self.board[27] = self.board[35] = "B"
         self.board[28] = self.board[36] = "W"
 
@@ -17,6 +17,7 @@ class Board:
             for j in range(8):
                 print repr(self.board[i*8 + j]).rjust(1),
             print ''
+        print "Current count: B: %d ---- W: %d" %(self.count_difference("b"), self.count_difference('w'))
 
     def count_difference(self, type="B"):
         return self.board.count(type.upper()) - self.board.count(self.opponent(type.upper()))
@@ -26,6 +27,7 @@ class Board:
             return self.white
         else:
             return self.black
-            
-    def to_lisp_board(self):
-        pass
+
+    def to_lisp_board(self, board = None):
+        if not board:
+            board = self.board
