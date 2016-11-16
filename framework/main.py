@@ -1,8 +1,13 @@
+import sys, os, subprocess, shlex
+
+
+# TODO: remove Globals :)
 black = "B"
 white = "W"
 tu_outer_board = "X"
 empty_slot = "_"
 
+# TODO: move to separate file
 class Board:
     def __init__(self):
         self.black = "B"
@@ -29,3 +34,30 @@ class Board:
             
     def to_lisp_board(self):
         pass
+#end class Board
+
+def main(args):
+	#run the command, use manual buffering into a file
+	testOut = open("test.log",'w')
+	testRead = open("test.log",'r')
+	for arg in args:
+		cmd = shlex.split(arg)
+		print "spawning %s" % cmd
+		p = subprocess.Popen(cmd, stdin=subprocess.PIPE,stdout=testOut,stderr=subprocess.PIPE)
+		print testRead.readline()  # Prints empty line
+		#kill the process immediately
+		while(p.poll() is None):
+			p.kill()
+		print "process killed (%s) " % p.poll()
+	#end for
+	print "closing"
+		
+	#end for
+	testOut.close()
+	testRead.close()
+#end main
+
+#entry point
+if __name__=="__main__":
+	print "Othello engine starting"
+	main(sys.argv[1:])
