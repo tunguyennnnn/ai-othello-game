@@ -1,16 +1,12 @@
-black = "B"
-white = "W"
-tu_outer_board = "X"
-empty_slot = "_"
-
-class Board:
+import subprocess as sb
+class OthelloPlay:
     def __init__(self):
         self.black = "B"
         self.white = "W"
         self.empty = "_"
         self.board = [self.empty for i in range(64)] #middle
-        self.board[27] = self.board[35] = "B"
-        self.board[28] = self.board[36] = "W"
+        self.board[27] = self.board[36] = "B"
+        self.board[28] = self.board[35] = "W"
 
     def print_board(self):
         for i in range(8):
@@ -28,6 +24,15 @@ class Board:
         else:
             return self.black
 
-    def to_lisp_board(self, board = None):
+    def to_lisp_board(self, type = "B", depth=3,  board = None):
         if not board:
             board = self.board
+        string_board = "%s %d" %(type, depth)
+        for item in board:
+            string_board += ' %s' %item
+        return string_board
+
+    def play_game(self, black_command = [], white_command = [], depth = 3):
+        process = sb.Popen(black_command, stdin = sb.PIPE, stdout = sb.PIPE, stderr = sb.PIPE, bufsize = 0)
+        print process.communicate(self.to_lisp_board())
+        return process
