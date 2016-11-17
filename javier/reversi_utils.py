@@ -4,7 +4,19 @@
 
 from reversi import black,white,empty
 
-def check_flip_num(future_move,color_symbol,board):
+def get_counterpart(symbol):
+	if symbol is black:
+		return white
+	elif symbol is white:
+		return black
+	else:
+		return empty
+#end get_counterpart
+
+def check_flip_num(board,future_move,color_symbol):
+	"""
+	Check how many pieces are flipped if color_symbol plays future_move in board
+	"""
 	def check_horizontal():
 		pass
 	#end

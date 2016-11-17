@@ -6,7 +6,7 @@ black = "B"
 white = "W"
 empty = "0"
 
-def board_parser(in_string):
+def parse_board(in_string):
 	"""
 	Parse a given board in the expected format for this assignment
 	'((00000000)(00000000)(00000000)(000WB000)(000BW000)(00000000)(00000000)(00000000))'

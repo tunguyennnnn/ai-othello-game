@@ -23,17 +23,8 @@ class edge():
 class node():
 	"""
 	A tree type node. Can have n-children 
-	"""
-	def __init__(self):
-		self.label = ""
-		self.edges = []
-		self.heuristic = 0
-		self.value = None
-		
-		self.root = None
-		self.root_edge = None
-		
-	def __init__(self, root, value, heuristic):
+	"""	
+	def __init__(self, root=None, value=None, heuristic=None):
 		self.label = ""
 		self.edges = []
 		self.heuristic = heuristic
