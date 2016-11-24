@@ -1,27 +1,21 @@
 import sys, os, subprocess, shlex
+import subprocess as sb
 
-
-# TODO: remove Globals :)
-black = "B"
-white = "W"
-tu_outer_board = "X"
-empty_slot = "_"
-
-# TODO: move to separate file
-class Board:
+class OthelloPlay:
     def __init__(self):
         self.black = "B"
         self.white = "W"
         self.empty = "_"
-        self.board = [self.empty for i in range(64)]
-        self.board[27] = self.board[35] = "B"
-        self.board[28] = self.board[36] = "W"
+        self.board = [self.empty for i in range(64)] #middle
+        self.board[27] = self.board[36] = "B"
+        self.board[28] = self.board[35] = "W"
 
     def print_board(self):
         for i in range(8):
             for j in range(8):
                 print repr(self.board[i*8 + j]).rjust(1),
             print ''
+        print "Current count: B: %d ---- W: %d" %(self.count_difference("b"), self.count_difference('w'))
 
     def count_difference(self, type="B"):
         return self.board.count(type.upper()) - self.board.count(self.opponent(type.upper()))
@@ -32,9 +26,18 @@ class Board:
         else:
             return self.black
             
-    def to_lisp_board(self):
-        pass
-#end class Board
+    def to_lisp_board(self, type = "B", depth=3,  board = None):
+        if not board:
+            board = self.board
+        string_board = "%s %d" %(type, depth)
+        for item in board:
+            string_board += ' %s' %item
+        return string_board
+
+    def play_game(self, black_command = [], white_command = [], depth = 3):
+        process = sb.Popen(black_command, stdin = sb.PIPE, stdout = sb.PIPE, stderr = sb.PIPE, bufsize = 0)
+        print process.communicate(self.to_lisp_board())
+        return process#end class Board
 
 def main(args):
 	#run the command, use manual buffering into a file
