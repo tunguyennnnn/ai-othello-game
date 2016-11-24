@@ -36,30 +36,26 @@ def rando(args, board,symbol):
 
 def greedy(args, board, symbol):
 	"""
-	TODO: A regular greedy agent which maximizes the amount of pieces flipped (always)
+	A regular greedy agent which maximizes the amount of pieces flipped (always)
 	"""
 	# no args expected
-	heuristic = MaxPieces
+	heuristic = heuristics.MaxPieces
 	if len(args)>1:
 		heuristic = eval("heuristics."+args[0])
 
-	#TODO: are we operating on a list of strings or a list of nodes?
-	subnodes = reversi.valid_moves(root.value,maxSymbol)
-	best_index=-1
-	best_value=-1
-	for i in range(len(subnodes)):
-		val=reversi.check_flip_num(board,subnodes[i],symbol)
-		if(val>best_value):
-			best_value=val
-			best_index=-1
-	#end for
-	move = subnodes[best_index]
-	board[move[0]][move[1]]=symbol
+	# We are operating on tuples
+	possible_moves = reversi.valid_moves(board,symbol)
+	results = heuristic(board, possible_moves, symbol)
+	results.sort()
+	results.reverse()
 
-	return board
+	return results[0][1]
 #end greedy
 
 def minimax(args, board, symbol):
+	"""
+	TODO: 
+	"""
 	#One-time runtime check
 	if(len(args)<1):
 		raise RuntimeError("Minimax agent expected a list with at least the depth!")
