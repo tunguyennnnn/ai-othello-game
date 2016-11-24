@@ -3,21 +3,18 @@
 # datastructs.py: auxiliary data structures used in the assignment
 
 class edge():
-
 	def __init__(self):
 		self.start_node = None
 		self.end_node = None
 		self.weight = 0
-	
-	def __init__(self, start, end, weight):
-		self.start_node = start
-		self.end_node = end
-		self.weight = weight
+		self.label = None
 	
 	def connect(self,start,end):
 		self.start_node=start
 		self.end_node=end
-
+		
+	def __lt__(self, other):
+		return self.weight < other.weight
 #end edge
 
 class node():
@@ -41,10 +38,11 @@ class node():
 		return self.heuristic < other.heuristic
 
 		
-	def add_child(self,node,weight):
+	def add_child(self,node,weight,label=None):
 		new_edge = edge()
 		new_edge.connect(self,node)
 		new_edge.weight = weight
+		new_edge.label = label
 		
 		node.root = self
 		node.root_edge = new_edge
@@ -59,6 +57,19 @@ class node():
 			new_edges[i].connect(self,new_nodes[i])
 			new_nodes[i].root_edge=new_edges[i]
 	#end add_children
+	
+	def add_lazy_edges(self,new_edges,is_negative=False):
+		if len(new_edges)<1:
+			return
+		# new edges is expected to be a list of tuples of the form (val,(x,y))
+		modifier = 1
+		if is_negative:
+			modifier = -1
+		for info in new_edges:
+			new_node = node(self,None,modifier*info[0])
+			self.add_child(new_node,modifier*info[0],info[1])
+		#end for
+	#end add_lazy_edges
 	
 #end node
 			

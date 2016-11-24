@@ -14,6 +14,12 @@ def MaxPieces(board, moves, color):
 	return [(evaluator(move),move) for move in moves]
 #end MaxPieces
 
+def MaxNumber(board, moves, color):
+	"""
+	Counts the number of pieces currently on the board 
+	"""
+#end MaxNumber
+
 def NoCorners(board, moves, color):
 	"""
 	Assesses the best strategy to win the game by avoiding high risk areas and taking corners
@@ -44,8 +50,11 @@ def NoCorners(board, moves, color):
 #end
 
 def WinningHeuristic(board, moves, color):
-	max_pieces = MaxPieces(board, move, color)
-	best_strategy = NoCorners(board, move, color)
+	"""
+	Combines both of our heuristics to achieve the max pieces while attempting to take the best placements and avoid any risky ones
+	"""
+	max_pieces = MaxPieces(board, moves, color)
+	best_strategy = NoCorners(board, moves, color)
 	retVal = []
 	# merge the two lists into one
 	# this changes the order of the tuple from (val,(x,y)) to ((x,y),val)
