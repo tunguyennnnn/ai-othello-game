@@ -7,17 +7,19 @@ import reversi
 from agents import *
 
 def main(args):
-	if len(args)<1:
+	if len(args)<2:
 		#FUTURE: maybe add type of game for single or keep-alive
-		print("Usage:\n\tpython main.py <Agent> <Agent specific options>")
+		print("Usage:\n\tpython main.py <Color (B or W)> <Agent> <Agent specific options>")
 		print("Known agents:")
 		#print("\t %s" % [x for x in dir(agents) if x.find('_')<0])
 		print("\t"+", ".join(list_agents()))
 		exit(1)
 		
 	#args were correct, get the agent we want
-	agent = eval(args[0])
-	agent_args = args[1:]
+	agent = eval(args[1])
+	color = args[0].upper()
+	agent_args = args[2:]
+	print(args)
 	
 	keep_alive=False
 	board_state = ""
@@ -26,10 +28,12 @@ def main(args):
 	
 	#Game loop
 	while(True):
-		current_board = raw_input()  # Read STDIN
+		#current_board = raw_input()  # Read STDIN
+		#TODO: Remove when finished
+		current_board = '((00000000)(00000000)(00000000)(000WB000)(000BW000)(00000000)(00000000)(00000000))'
 		current_board = reversi.parse_board(current_board)
-		
-		next_state = agent(current_board, agent_args)
+		# agents expect arguments to be passed in as (args, board,symbol)
+		next_state = agent(agent_args, current_board, color)
 		print(next_state)  # put it back to STDOUT
 		
 		if not keep_alive or reversi.is_game_over(next_state):

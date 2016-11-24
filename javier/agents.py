@@ -17,11 +17,16 @@ def list_agents():
 	return sanitized
 #end list_agents
 
+def echo_agent(args, board, symbol):
+	print(board,symbol)
+	return reversi.valid_moves(board,symbol)
+#end echo_agent
+
 def rando(args, board,symbol):
 	"""
 	A Random Agent that plays wherever it can play at random points in time
 	"""
-	#TODO:
+	#TODO: 
 	return None
 #end rando
 
@@ -32,7 +37,7 @@ def greedy(args, board, symbol):
 	# no args expected
 	heuristic = MaxPieces
 	if len(args)>1:
-		heuristic = eval("heuristics."args[0])
+		heuristic = eval("heuristics."+args[0])
 
 	#TODO: are we operating on a list of strings or a list of nodes?
 	subnodes = reversi.valid_moves(root.value,maxSymbol)
@@ -58,11 +63,12 @@ def minimax(args, board, symbol):
 	in_depth = args[0]
 	heuristic = heuristics.MaxPieces
 	if(len(args)>1):
-		heuristic = eval("heuristics."args[1])
+		heuristic = eval("heuristics."+args[1])
 
 	# Some simple method definitions
 	counterpart = reversi_utils.get_counterpart
 	#TODO: add heuristic evaluation in recursive method
+	#TODO: make board a node 
 	def recursive(root,depth,maxSymbol):	
 		"""Recursive component of minimax"""
 		if depth<1:

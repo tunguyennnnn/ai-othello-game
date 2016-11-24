@@ -48,6 +48,17 @@ class node():
 		
 		node.root = self
 		node.root_edge = new_edge
-
+	#end add child
+		
+	def add_children(self,children):
+		# we assume childs hasn't been added before
+		num_children = len(children)
+		new_nodes = [node(root=self,value=x,heuristic=0) for x in children]
+		new_edges = [edge() for i in range(num_children)]
+		for i in range(num_children):
+			new_edges[i].connect(self,new_nodes[i])
+			new_nodes[i].root_edge=new_edges[i]
+	#end add_children
+	
 #end node
 			
