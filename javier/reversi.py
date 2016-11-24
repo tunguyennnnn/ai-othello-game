@@ -36,17 +36,24 @@ def parse_board(in_string):
 	return [list(x) for x in array_format]
 #end board_parse
 
+#TODO: Add a check to return the number of pieces moved.
 def valid_moves(board_state, color_symbol):
 	"""
 	Get all possible moves that can be made from the current board_state by a color_symbol
 
 	Returns a list of tuples as (x,y) for all valid moves in the board
-	"""	
-	valid_moves = set()
+	"""
+	# Generates a new list and checks if our symbol is there
+	def slice_and_check(x,y,direction):
+		#slice
+		single = [board_state[x+(i*direction[0])][y+(i*direction[1])] for i in range(8) if x+(i*direction[0])<8 and y+(i*direction[1])<8]
+		return color_symbol in single
+
+	# Check the direction
+	check_dir = lambda A,B : (A[0]-B[0],A[1]-B[1])
 	
-	# Map out the symbols
+	# 1. Map out the symbols
 	other_symbol = get_counterpart(color_symbol)
-	print(other_symbol)
 	own_symbols = []
 	counter_symbols = []
 	for i in range(8):
@@ -57,24 +64,22 @@ def valid_moves(board_state, color_symbol):
 		counter_symbols.extend(row_pieces)
 	#end for
 	
-	# Check which placements would be valid
+	# 2. Check which placements would be valid
 	num_own_symbols = len(own_symbols)
-	print(counter_symbols)
+	valid_moves = set()
 	for position in counter_symbols:
 		x = position[0]
 		y = position[1]
 		adjacents = ((x-1,y+1),(x-1,y),(x-1,y-1),(x,y+1),(x,y-1),(x+1,y+1),(x+1,y),(x+1,y-1))
-		print(adjacents)
+		#print(adjacents)
 		for item in adjacents:
-			#TODO: missing check to get final piece
 			if is_valid_and_empty(board_state,item[0],item[1]):
-				pass
-				#check if there's a piece that can connect in a straight line
-			#	tangent = (item[0]-position[0], item[1]-position[1]) # Not going to work
-					
-				
-		
-	
+				direction = check_dir(position,item)
+				if(slice_and_check(item[0],item[1],direction)):
+					valid_moves.add(item)
+		#end for item
+	#end for position
+
 	return valid_moves
 #end valid_moves
 
