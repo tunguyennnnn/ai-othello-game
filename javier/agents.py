@@ -2,8 +2,9 @@
 # Javier E. Fajardo - 26487602
 # agents.py: defines all agents made to play Reversi for one or several moves
 
-import heuristics
+import random
 import reversi
+import heuristics
 import reversi_utils
 
 #TODO: EXTENSIVELY TEST
@@ -18,6 +19,9 @@ def list_agents():
 #end list_agents
 
 def echo_agent(args, board, symbol):
+	"""
+	
+	"""
 	print(board,symbol)
 	return reversi.valid_moves(board,symbol)
 #end echo_agent
@@ -26,13 +30,13 @@ def rando(args, board,symbol):
 	"""
 	A Random Agent that plays wherever it can play at random points in time
 	"""
-	#TODO: 
-	return None
+	valid_next_moves = reversi.valid_moves(board,symbol)
+	return random.choice(valid_next_moves)
 #end rando
 
 def greedy(args, board, symbol):
 	"""
-	A regular greedy agent which maximizes the amount of pieces flipped (always)
+	TODO: A regular greedy agent which maximizes the amount of pieces flipped (always)
 	"""
 	# no args expected
 	heuristic = MaxPieces
