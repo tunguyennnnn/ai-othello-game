@@ -2,7 +2,7 @@
 # Tu Nguyen and Javier E. Fajardo
 
 import sys, os, subprocess, shlex
-import subprocess as sb
+import time
 
 from othello import OthelloPlay
 from player import *
@@ -26,21 +26,24 @@ def LaunchBotGame(black_player,white_player):
 	black_move = (None,None)
 	white_move = (None,None)
 	pass_move = (-1,-1)
-	
+	#TODO: modify and flip the board pieces after each move
 	while(black_move!=pass_move and white_move!=pass_move):
-		cereal = board.serialize()
-		print(cereal)
+		board.printout()
 		# black moves first
-		black_move = black_player.play(cereal)
+		black_move = black_player.play(board.serialize())
+		print "B: %s" % (str(black_move))
 		if black_move!=pass_move:
 			board.board[black_move[0]][black_move[1]]=board.black # TODO: make a method in board
-		
+		time.sleep(1)
 		cereal = board.serialize()
-		print(cereal)
+
+		board.printout()
 		# white moves second
-		white_move = black_player.play(cereal)
+		white_move = white_player.play(board.serialize())
+		print "W: %s" % (str(white_move))
 		if white_move!=pass_move:
-			board.board[black_move[0]][black_move[1]]=board.black # TODO: make a method in board
+			board.board[white_move[0]][white_move[1]]=board.white # TODO: make a method in board
+		time.sleep(1)
 	#end while
 	
 	cereal = board.serialize()
@@ -58,8 +61,8 @@ def main(args):
 		LaunchUIGames(white)
 	elif num_args==2:
 		print("Launching AI v. AI game")
-		black = CPU_Player('B',args[0])
-		white = CPU_Player('W',args[1])
+		white = CPU_Player('W',args[0])
+		black = CPU_Player('B',args[1])
 		LaunchBotGame(black,white)
 	else:
 		print("Error with arguments!")

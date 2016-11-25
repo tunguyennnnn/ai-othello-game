@@ -26,6 +26,16 @@ class OthelloPlay:
 	#end for
 	cereal = "(("+")(".join(cereal)+"))"
 	return cereal
+	
+    def printout(self):	
+	"""
+	Pretty-prints the board onto the terminal
+	"""
+	print " ".join(['_']*9) + " X"
+	for row in range(8):
+		print "|%s| %d"% ((" ".join(self.board[row])).replace(self.empty,'-'),row)
+	# end for
+	print "Y"+" ".join([str(i) for i in range(8)])
 
     def count_difference(self, type="B"):
         return self.board.count(type.upper()) - self.board.count(self.opponent(type.upper()))
