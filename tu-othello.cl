@@ -20,34 +20,20 @@
 		     :test #'(lambda (x y)
 			       (find y x :test #'string=)))))
     (if n
-	(split-str-1 (subseq string 0 n) separator (cons (subseq string (1+ n)) r))
-      (cons string r))))		
-
-(defparameter *weights*
-  '#(0   0   0  0  0  0  0   0   0 0
-     0 120 -20 20  5  5 20 -20 120 0
-     0 -20 -40 -5 -5 -5 -5 -40 -20 0
-     0  20  -5 15  3  3 15  -5  20 0
-     0   5  -5  3  3  3  3  -5   5 0
-     0   5  -5  3  3  3  3  -5   5 0
-     0  20  -5 15  3  3 15  -5  20 0
-     0 -20 -40 -5 -5 -5 -5 -40 -20 0
-     0 120 -20 20  5  5 20 -20 120 0
-     0   0   0  0  0  0  0   0   0 0))
-
-
+		(split-str-1 (subseq string 0 n) separator (cons (subseq string (1+ n)) r))
+     	 (cons string r))))		
 
 
 ;;Representation of the board: an array of 100 slots ->
 ;;the legal positions are from 11 to 88
-(defconstant move-directions '(-11 -9 -9 -1 1 9 10 11))
+(defconstant move-directions '(-11 -9 -9 -1 1 -10 10 11))
 
 (defconstant empty "_" "emtpy slot")
 (defconstant black "B" "black play")
 (defconstant white "W" "white play")
 (defconstant outer "X" "outer board")
 
-(defconstant board-slots (mapa-b #'(lambda (i) i) 11 88) "all slots of the board users can play")
+(defconstant board-slots (loop for i from 11 to 88 when (<= 1 (mod i 10) 8) collect i) "all slots of the board users can play")
 
 (deftype board-square () '(string))
 
@@ -76,10 +62,14 @@
 		(format t "~&" (* 10 row))
 		(loop for col from 1 to 8
 			for piece = (aref board (+ col (* 10 row)))
-			do (format t "~a " piece))))
+			do (format t "~a " piece)))
+	(format t "~& B: ~d    W: ~d   ~d"
+          (count-if #'(lambda (x) (equalp black x)) board)
+          (count-if #'(lambda (x) (equalp white x)) board)
+          (get-difference black board)))
 	   
 (defun valid-move? (pos)
-	(and (<= 11 pos 88))) 
+	(and (<= 11 pos 88) (not (member pos '(19 20 29 30 39 40 49 50 59 60 69 70 79 80)))))
 
 (defun legal-move? (pos type board)
 	(and (equalp (aref board pos) empty)
@@ -119,11 +109,6 @@
 
 		 
 (defun get-difference (type board)
-	(print board)
-	(print type)
-	(print (count type board))
-	(print (opponent type))
-	(print (count (opponent type) board))
 	(- (count-if #'(lambda (x) (equalp type x)) board)
 	   (let ((op (opponent type)))
 	   	(count-if #'(lambda (x) (equalp op x)) board))))
@@ -146,6 +131,30 @@
     (+1 winning-value)))
 
 
+(defparameter *weights*
+  '#(0   0   0  0  0  0  0   0   0 0
+     0 120 -20 20  5  5 20 -20 120 0
+     0 -20 -40 -5 -5 -5 -5 -40 -20 0
+     0  20  -5 15  3  3 15  -5  20 0
+     0   5  -5  3  3  3  3  -5   5 0
+     0   5  -5  3  3  3  3  -5   5 0
+     0  20  -5 15  3  3 15  -5  20 0
+     0 -20 -40 -5 -5 -5 -5 -40 -20 0
+     0 120 -20 20  5  5 20 -20 120 0
+     0   0   0  0  0  0  0   0   0 0))
+
+
+(defun get-sum-score (type board)
+	(let ((opp (opponent type))
+		  (score 0))
+		(dolist (slot board-slots)
+			(cond ((equalp (aref board slot) type)
+					(setf score (+ score (aref *weights* slot))))
+				  ((equalp (aref board slot) opp)
+				  	(setf score (- score (aref *weights* slot))))))
+		(+ score (get-difference type board))))
+
+
 (defun alpha-beta-helper (type board max min depth eval-func)
 	(if (eql depth 0) ;;reach depth -> evaluate the 
 		(funcall eval-func type board)
@@ -160,9 +169,6 @@
 							(return)
 							(let ((board-after-play (make-move pos type (copy-board board))))
 								(let ((val (- (alpha-beta-helper (opponent type) board-after-play (- min) (- max) (1- depth) eval-func))))
-									(print depth)
-									(display-board board-after-play)
-									(print val)
 									(when (> val max)
 										(setf chosen-pos pos max val))))))
 					(values max chosen-pos))))))
@@ -214,13 +220,17 @@
 	(let ((type (car input))
 		  (depth (parse-integer (cadr input)))
 		  (board (translate-board (cddr input))))
-		(let* ((strat (alpha-beta 3 #'get-difference))
+		(let* ((strat (alpha-beta 3 #'weighted-squares))
 				(my-pos (funcall strat type board)))
 			(setf (aref board my-pos) type)
 			(display-board board))))
 
 
-(othello-play (split-str (car *args*)))
+
+(let ((strat1 (alpha-beta 3 #'get-difference))
+	  (strat2 (alpha-beta 3 #'get-sum-score)))
+	(play-game strat1 strat2))
+;;(othello-play (split-str (car *args*)))
 
 
 
