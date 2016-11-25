@@ -36,9 +36,9 @@ def main(args):
 	start = time.time()
 	#Game loop
 	while(True):
-		#current_board = raw_input()  # Read STDIN
+		current_board = raw_input()  # Read STDIN
 		#TODO: Remove when finished
-		current_board = '((00000000)(00000000)(00000000)(000WB000)(000BW000)(00000000)(00000000)(00000000))'
+		#current_board = '((00000000)(00000000)(00000000)(000WB000)(000BW000)(00000000)(00000000)(00000000))'
 		current_board = reversi.parse_board(current_board)
 		# agents expect arguments to be passed in as (args, board,symbol)
 		move = agent(agent_args, current_board, color)

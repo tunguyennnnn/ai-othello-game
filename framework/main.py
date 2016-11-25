@@ -6,16 +6,17 @@ import time
 
 from othello import OthelloPlay
 from player import *
+import ui
 
 def PrintUsage():
 	print("TJ Othello Engine - Usage:")
-	print("  AI v. AI: python main.py \"Black Player Commandline\" \"White Player Commandline\"")
-	print("  UI Game : python main.py \"Black Player Commandline\"")
+	print("  AI v. AI: python main.py \"White Player Commandline\" \"Black Player Commandline\"")
+	print("  UI Game : python main.py \"White Player Commandline\"")
 	exit(1)
 #end PrintUsage
 
 def LaunchUIGame(cpu_player):
-	raise NotImplemented("Need to integrate with the UI first")
+	ui.main(cpu_player)
 #end 
 
 def LaunchBotGame(black_player,white_player):
@@ -58,7 +59,7 @@ def main(args):
 	if num_args==1:
 		print("Launching Player v. PC game")
 		white = CPU_Player('W',args[0])
-		LaunchUIGames(white)
+		LaunchUIGame(white)
 	elif num_args==2:
 		print("Launching AI v. AI game")
 		white = CPU_Player('W',args[0])
