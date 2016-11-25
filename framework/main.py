@@ -1,4 +1,6 @@
+import sys, os, subprocess, shlex
 import subprocess as sb
+
 class OthelloPlay:
     def __init__(self):
         self.black = "B"
@@ -23,7 +25,7 @@ class OthelloPlay:
             return self.white
         else:
             return self.black
-
+            
     def to_lisp_board(self, type = "B", depth=3,  board = None):
         if not board:
             board = self.board
@@ -35,4 +37,30 @@ class OthelloPlay:
     def play_game(self, black_command = [], white_command = [], depth = 3):
         process = sb.Popen(black_command, stdin = sb.PIPE, stdout = sb.PIPE, stderr = sb.PIPE, bufsize = 0)
         print process.communicate(self.to_lisp_board())
-        return process
+        return process#end class Board
+
+def main(args):
+	#run the command, use manual buffering into a file
+	testOut = open("test.log",'w')
+	testRead = open("test.log",'r')
+	for arg in args:
+		cmd = shlex.split(arg)
+		print "spawning %s" % cmd
+		p = subprocess.Popen(cmd, stdin=subprocess.PIPE,stdout=testOut,stderr=subprocess.PIPE)
+		print testRead.readline()  # Prints empty line
+		#kill the process immediately
+		while(p.poll() is None):
+			p.kill()
+		print "process killed (%s) " % p.poll()
+	#end for
+	print "closing"
+		
+	#end for
+	testOut.close()
+	testRead.close()
+#end main
+
+#entry point
+if __name__=="__main__":
+	print "Othello engine starting"
+	main(sys.argv[1:])
