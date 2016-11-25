@@ -19,10 +19,12 @@ def echo_agent(args, board, symbol):
 	"""
 	Just prints and echoes back. Used for debug purposes
 	"""
-	print(board,symbol)
-	
-	moves = reversi.valid_moves(board,symbol)
-	print(heuristics.Win(board,moves,symbol))
+	#print(board,symbol)
+	reversi.print_board(board)
+	move = rando(args,board,symbol)
+	print(move)
+	reversi.print_board(reversi.play_move(board,move,symbol))
+	#print(heuristics.Win(board,moves,symbol))
 	ret = (3,4)
 	return ret
 #end echo_agent
@@ -110,7 +112,7 @@ def minimax(args, board, symbol):
 		update_val = 0
 		for a_move in moves:
 			# Play the move, make a new board, call recursively
-			next_board = reversi.play_move(start.value,a_move)
+			next_board = reversi.play_move(start.value,a_move,maxSymbol)
 			next_node = node(start,next_board,0)
 			start.add_child(next_node,0,a_move)
 			

@@ -10,13 +10,17 @@ def is_valid(x,y):
 	return x < 8 and x >= 0 and y < 8 and y>=0
 #end is_valid
 def is_valid_and_empty(board,x,y):
-	return is_valid(x,y) and board[y][x]==empty
+	return is_valid(x,y) and board[x][y]==empty
 #end is_valid_and_empty
 
 # Generates a new list along a one dimension slice of the board
 def slice_board(board,direction,x,y):
-	return [board[x+(i*direction[0])][y+(i*direction[1])] for i in range(8) if x+(i*direction[0])<8 and y+(i*direction[1])<8]
+	return [board[x+(i*direction[0])][y+(i*direction[1])] for i in range(8) if is_valid(x+(i*direction[0]), y+(i*direction[1])) ]
 #end slice_board
+
+def get_sliced_coords(board,direction,x,y):
+	return [(x+(i*direction[0]),y+(i*direction[1])) for i in range(8) if is_valid(x+(i*direction[0]), y+(i*direction[1])) ]
+#end get_sliced_coords
 
 def get_counterpart(symbol):
 	if symbol == black:
@@ -40,6 +44,29 @@ def parse_board(in_string):
 	array_format = in_string[2:-2].split(')(')
 	return [list(x) for x in array_format]
 #end board_parse
+
+def print_board(board):
+	"""
+	Pretty-prints the board onto the terminal
+	"""
+	print " ".join(['_']*9)
+	for row in board:
+		print "|%s|"% (" ".join(row)).replace(empty,'-')
+	# end for
+	print " ".join(['T']*9)
+#end print_board
+
+def serialize_board(board):
+	"""
+	Transforms the board back to a string
+	"""
+	cereal = []
+	for row in board:
+		cereal.append("".join(row))
+	#end for
+	cereal = "(("+")(".join(cereal)+"))"
+	return cereal
+#end serialize_board
 
 def valid_moves(board_state, color_symbol):
 	"""
@@ -122,6 +149,48 @@ def check_flip_num(board,future_move,color_symbol):
 	return flipped
 #end check flip num
 
+def play_move(board,move,color_symbol):
+	# Actually play the move
+	next_board = board
+	x = move[0]
+	y = move[1]
+	next_board[x][y] = color_symbol
+	
+	# Flip all the pieces necessary
+	directions = ((-1,+1),(-1,0),(-1,-1),(0,+1),(0,-1),(+1,+1),(+1,0),(+1,-1))
+	flipped = 0
+	
+	other_symbol = get_counterpart(color_symbol)
+	for direction in directions:
+		# slice the board in a single dimension
+		single_dimension = get_sliced_coords(board,direction,x,y)
+		single_dimension = single_dimension[1:]
+
+		stop_idx = 0
+		# Check when to stop
+		for i in range(len(single_dimension)):
+			a_place=single_dimension[i]
+			symbol = next_board[a_place[0]][a_place[1]]
+			# Nothing to flip
+			if symbol==empty or symbol==color_symbol:
+				break
+			if symbol==other_symbol:
+				stop_idx+=1
+		#end for
+		
+		flipped+=stop_idx
+		if stop_idx>0:
+			for i in range(stop_idx+1):
+				move = single_dimension[i]
+				next_board[move[0]][move[1]] = color_symbol
+			#end for stop_idx
+		#end if
+	#end for directions
+	
+	# return the modified board
+	return next_board
+#end play_move
+
 def is_game_over(board_state):
 	"""
 	Check if the game cannot continue
@@ -151,6 +220,6 @@ def check_winner(board_state):
 	elif num_white < num_black:
 		return black
 		
-	# Tie or the game is not over
+	# Tie
 	return None
 #end check_winner
