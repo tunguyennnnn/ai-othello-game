@@ -235,13 +235,17 @@
 
 
 (defun othello-play (type depth input)
-	(let* ((strat (alpha-beta 3 #'weighted-squares))
-		  (my-pos (funcall strat type board)))
+	(let* ((strat (alpha-beta 3 #'get-sum-score))
+		  (my-pos (funcall strat type input)))
 		(if my-pos 
-			(multiple-value-bind (col row) (floor my-pos 100)
-				(print "~d ~d" (1- col) (1- row)))
-			"-1 -1"))
+			(multiple-value-bind (col row) (floor my-pos 10)
+				(princ (format nil "~d ~d" (1- col) (1- row))))
+			(princ "-1 -1"))))
 
+
+(defvar a)
+(defun storing ()
+	(setf a (read-line)))
 
 
 
@@ -249,7 +253,6 @@
 ;	  (strat2 (alpha-beta 3 #'get-sum-score)))
 ;	(play-game strat1 strat2))
 ;(othello-play (split-str (car *args*)))
-(othello-play (car *args*) (cadr *args*) (translate-board (caddr *args*)))
-
-
+(storing)
+(othello-play (car *args*) (cadr *args*) (translate-board a))
 
