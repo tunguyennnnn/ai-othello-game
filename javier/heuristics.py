@@ -2,28 +2,43 @@
 # Javier E. Fajardo - 26487602
 # heuristics.py: defines all heuristics that can be used in weighing decisions in a game algorithm
 
-from reversi import check_flip_num
+from reversi import check_flip_num, play_move
+
+# Note: the signatures and return format of all of these functions is the same
+# - Signature: Heuristic(board, moves, color)
+# - Return Format: [(value,(x_pos,y_pos)),(value,(x_pos,y_pos)),...]
 
 def MaxPieces(board, moves, color):
 	"""
 	Counts the number of pieces flipped by each move and returns a list of tuples
-	Return format: [(value,(x_pos,y_pos)),(value,(x_pos,y_pos)),...]
 	"""
-	retVal = []
 	evaluator = lambda x: check_flip_num(board,x,color)
 	return [(evaluator(move),move) for move in moves]
 #end MaxPieces
 
 def MaxNumber(board, moves, color):
 	"""
-	Counts the number of pieces currently on the board 
+	Counts the number of pieces on the board after move
 	"""
+	retVal = []
+	for a_move in moves:
+		next_board = play_move(board,a_move,color)
+		# count the pieces!
+		color_num=0
+		for row in board:
+			for column in row:
+				if column==color:
+					color_num+=1
+		#end board iteration
+		retVal.append((color_num,a_move))
+	#end for
+	
+	return retVal
 #end MaxNumber
 
 def NoCorners(board, moves, color):
 	"""
 	Assesses the best strategy to win the game by avoiding high risk areas and taking corners
-	Return format: [(value,(x_pos,y_pos)),(value,(x_pos,y_pos)),...]
 	"""
 	risk_val = -5
 	max_risk = set([(1,1),(1,6),(6,1),(6,6)])

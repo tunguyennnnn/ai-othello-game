@@ -7,22 +7,33 @@ white = "W"
 empty = "0"
 
 def is_valid(x,y):
+	"""Check if x,y are within bounds"""
 	return x < 8 and x >= 0 and y < 8 and y>=0
 #end is_valid
 def is_valid_and_empty(board,x,y):
+	"""Check if within bounds and with an empty symbol"""
 	return is_valid(x,y) and board[x][y]==empty
 #end is_valid_and_empty
 
 # Generates a new list along a one dimension slice of the board
 def slice_board(board,direction,x,y):
+	"""
+	Returns a one dimensional view of the board along direction starting at x,y
+	"""
 	return [board[x+(i*direction[0])][y+(i*direction[1])] for i in range(8) if is_valid(x+(i*direction[0]), y+(i*direction[1])) ]
 #end slice_board
 
 def get_sliced_coords(board,direction,x,y):
+	"""
+	Returns sliced coordinates
+	"""
 	return [(x+(i*direction[0]),y+(i*direction[1])) for i in range(8) if is_valid(x+(i*direction[0]), y+(i*direction[1])) ]
 #end get_sliced_coords
 
 def get_counterpart(symbol):
+	"""
+	Return the opposite to symbol
+	"""
 	if symbol == black:
 		return white
 	elif symbol == white:
@@ -59,6 +70,8 @@ def print_board(board):
 def serialize_board(board):
 	"""
 	Transforms the board back to a string
+	
+	Returns the serialized version of the board that can be parsed by 'parse_board'
 	"""
 	cereal = []
 	for row in board:
@@ -121,6 +134,8 @@ def valid_moves(board_state, color_symbol):
 def check_flip_num(board,future_move,color_symbol):
 	"""
 	Check how many pieces are flipped if color_symbol plays future_move in board
+	
+	Return flipped amount
 	"""
 	directions = ((-1,+1),(-1,0),(-1,-1),(0,+1),(0,-1),(+1,+1),(+1,0),(+1,-1))
 	x = future_move[0]
@@ -150,6 +165,11 @@ def check_flip_num(board,future_move,color_symbol):
 #end check flip num
 
 def play_move(board,move,color_symbol):
+	"""
+	Plays move on board using color_symbol.
+	
+	Returns a modified version of the original board with the move having been played
+	"""
 	# Actually play the move
 	next_board = board
 	x = move[0]
