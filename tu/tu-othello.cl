@@ -28,6 +28,8 @@
 ;;the legal positions are from 11 to 88
 (defconstant move-directions '(-11 -9 -9 -1 1 -10 10 11))
 
+(defconstant empty-side '(19 20 29 30 39 40 49 50 59 60 69 70 79 80))
+
 (defconstant empty "_" "emtpy slot")
 (defconstant black "B" "black play")
 (defconstant white "W" "white play")
@@ -208,29 +210,46 @@
 			  (t nil))))
 
 
-(defun translate-board (input-lst)
-	(let ((board (make-array 100 :initial-element outer)))
-		(do ((input input-lst (cdr input))
-			  (index 0 (1+ index)))
-			 ((null input) board)
-			 (multiple-value-bind (column row) (floor index 8)
-			 	(setf (aref board (+ (* (1+ column) 10) row 1)) (car input))))))
+(defun translate-board (str)
+	(let ((board (make-array 100 :initial-element outer))
+		  (input '()))
+		(do ((index 0 (1+ index))
+			 (board-index 11))
+			((or (>= index (length str)) (> board-index 88)) (return))
+			(progn 
+				(while (member board-index empty-side)
+					(incf board-index))
+				(cond ((equalp (aref str index) #\B)
+						(progn 
+							(setf (aref board board-index) black)
+							(incf board-index)))
+					  ((equalp (aref str index) #\W)
+						(progn 
+							(setf (aref board board-index) white)
+							(incf board-index)))
+					  ((equalp (aref str index) #\0)
+						(progn 
+							(setf (aref board board-index) empty)
+							(incf board-index))))))
+		board))
 
-(defun othello-play (input)
-	(let ((type (car input))
-		  (depth (parse-integer (cadr input)))
-		  (board (translate-board (cddr input))))
-		(let* ((strat (alpha-beta 3 #'weighted-squares))
-				(my-pos (funcall strat type board)))
-			(setf (aref board my-pos) type)
-			(display-board board))))
+
+(defun othello-play (type depth input)
+	(let* ((strat (alpha-beta 3 #'weighted-squares))
+		  (my-pos (funcall strat type board)))
+		(if my-pos 
+			(multiple-value-bind (col row) (floor my-pos 100)
+				(print "~d ~d" (1- col) (1- row)))
+			"-1 -1"))
 
 
 
-(let ((strat1 (alpha-beta 3 #'get-difference))
-	  (strat2 (alpha-beta 3 #'get-sum-score)))
-	(play-game strat1 strat2))
-;;(othello-play (split-str (car *args*)))
+
+;(let ((strat1 (alpha-beta 3 #'get-difference))
+;	  (strat2 (alpha-beta 3 #'get-sum-score)))
+;	(play-game strat1 strat2))
+;(othello-play (split-str (car *args*)))
+(othello-play (car *args*) (cadr *args*) (translate-board (caddr *args*)))
 
 
 
