@@ -2,6 +2,8 @@
 # Javier E. Fajardo - 26487602
 # reversi.py: everything related to the rules of the game and the board
 
+import copy
+
 black = "B"
 white = "W"
 empty = "0"
@@ -60,11 +62,11 @@ def print_board(board):
 	"""
 	Pretty-prints the board onto the terminal
 	"""
-	print " ".join(['_']*9)
-	for row in board:
-		print "|%s|"% (" ".join(row)).replace(empty,'-')
+	print " ".join(['_']*9) + " X"
+	for row in range(8):
+		print "|%s| %d"% ((" ".join(board[row])).replace(empty,'-'),row)
 	# end for
-	print " ".join(['T']*9)
+	print "Y"+" ".join([str(i) for i in range(8)])
 #end print_board
 
 def serialize_board(board):
@@ -170,8 +172,10 @@ def play_move(board,move,color_symbol):
 	
 	Returns a modified version of the original board with the move having been played
 	"""
-	# Actually play the move
-	next_board = board
+	# Copy the board and actually play the move
+	print "playing %s on %s" % (color_symbol,str(move))
+	print_board(board)
+	next_board = copy.deepcopy(board)
 	x = move[0]
 	y = move[1]
 	next_board[x][y] = color_symbol
@@ -185,28 +189,35 @@ def play_move(board,move,color_symbol):
 		# slice the board in a single dimension
 		single_dimension = get_sliced_coords(board,direction,x,y)
 		single_dimension = single_dimension[1:]
-
+		print(single_dimension)
 		stop_idx = 0
+		is_valid = False
 		# Check when to stop
 		for i in range(len(single_dimension)):
 			a_place=single_dimension[i]
 			symbol = next_board[a_place[0]][a_place[1]]
 			# Nothing to flip
-			if symbol==empty or symbol==color_symbol:
+			if symbol==empty:
 				break
 			if symbol==other_symbol:
 				stop_idx+=1
+			if symbol==color_symbol:
+				is_valid=True
+				break
 		#end for
 		
 		flipped+=stop_idx
-		if stop_idx>0:
+		if stop_idx>0 and stop_idx<7 and is_valid:
 			for i in range(stop_idx+1):
 				move = single_dimension[i]
+				print "flipped %s" % (str(move))
 				next_board[move[0]][move[1]] = color_symbol
 			#end for stop_idx
 		#end if
 	#end for directions
 	
+	print_board(next_board)
+	print "moved played"
 	# return the modified board
 	return next_board
 #end play_move

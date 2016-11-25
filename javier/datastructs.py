@@ -15,6 +15,12 @@ class edge():
 		
 	def __lt__(self, other):
 		return self.weight < other.weight
+	
+	def __str__(self):
+		return str(self.label)
+		
+	def __repr__(self):
+		return "Edge <%s>" % (str(self.label))
 #end edge
 
 class node():
@@ -32,7 +38,7 @@ class node():
 		return str(self.value)
 		
 	def __repr__(self):
-		return "Node <{}>".format(self.value)
+		return "Node %s" % (str(self.value))
 		
 	def __lt__(self, other):
 		return self.heuristic < other.heuristic
@@ -43,6 +49,7 @@ class node():
 		new_edge.connect(self,node)
 		new_edge.weight = weight
 		new_edge.label = label
+		self.edges.append(new_edge)
 		
 		node.root = self
 		node.root_edge = new_edge
@@ -58,12 +65,12 @@ class node():
 			new_nodes[i].root_edge=new_edges[i]
 	#end add_children
 	
-	def add_lazy_edges(self,new_edges,is_negative=False):
+	def add_lazy_edges(self,new_edges,is_positive=False):
 		if len(new_edges)<1:
 			return
 		# new edges is expected to be a list of tuples of the form (val,(x,y))
 		modifier = 1
-		if is_negative:
+		if not is_positive:
 			modifier = -1
 		for info in new_edges:
 			new_node = node(self,None,modifier*info[0])

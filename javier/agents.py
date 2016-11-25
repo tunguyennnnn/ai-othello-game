@@ -5,6 +5,8 @@
 import random
 import reversi
 import heuristics
+import copy
+from datastructs import node,edge
 
 # NOTE: if the agent doesn't find a valid move and is called, it will return (-1,-1)
 
@@ -68,23 +70,29 @@ def minimax(args, board, symbol):
 	if(len(args)<1):
 		raise RuntimeError("Minimax agent expected a list with at least the depth!")
 
-	in_depth = args[0]
+	in_depth = int(args[0])
 
 	evaluator = heuristics.MaxPieces
 	if(len(args)>1):
 		evaluator = eval("heuristics."+args[1])
+	counterpart=reversi.get_counterpart
 	# Finished checks and setup
 
-	def mm_recursive(start,depth,maxSymbol):	
+	def mm_recursive(start,depth,maximize):	
 		"""Recursive component of minimax"""
-		is_other_player = maxSymbol!=symbol
+		maxSymbol=symbol
+		turn_val = -2**32
+		if not maximize:
+			turn_val = 2**32
+			maxSymbol=counterpart(maxSymbol)
+
 		moves = reversi.valid_moves(start.value,maxSymbol)
-		
+		print "max:%s maxSymbol:%s moves:%s" % (str(maximize),maxSymbol,str(moves))
 		# Out of depth
 		if depth<1:
 			# deal with end games
 			if len(moves)<1:
-				if is_other_player:
+				if not maximize:
 					return -2**32
 				else:
 					return 2**32
@@ -92,35 +100,33 @@ def minimax(args, board, symbol):
 			
 			moves_eval = evaluator(start.value,moves,maxSymbol)
 			moves_eval.sort()
-			root.add_lazy_edges(moves_eval,is_other_player)
-			update_val = move_eval[-1][0]
-			if is_other_player:
+			start.add_lazy_edges(moves_eval,not maximize)
+			update_val = moves_eval[-1][0]
+			if not maximize:
 				update_val = -update_val
 			if start.root!=None:
 				start.root.heuristic=update_val
+			print(("="*8)+"MAX DEPTH"+("="*8))
 			return update_val
 		#end if depth
-		
-		#adjust for either maximizing or minimizing
-		turn_val = -2**32
-		nextSymbol = maxSymbol
-		if is_other_player:
-			turn_val = 2**32
-			nextSymbol=counterpart(maxSymbol)
-		
+			
 		# Get all nodes and evaluate them
 		update_val = 0
 		for a_move in moves:
 			# Play the move, make a new board, call recursively
-			next_board = reversi.play_move(start.value,a_move,maxSymbol)
+			#print(start)
+			next_board = reversi.play_move(copy.deepcopy(start.value),a_move,maxSymbol)
+			print "%s : %s" % (maxSymbol,str(a_move))
+			reversi.print_board(next_board)
 			next_node = node(start,next_board,0)
 			start.add_child(next_node,0,a_move)
-			
-			next_val = mm_recursive(next_node,depth-1,nextSymbol)
+			#print(start.edges)
+			next_val = mm_recursive(next_node,depth-1,not maximize)
 			start.edges[-1].weight = next_val
 			next_node.heuristic = next_val
-			
-			if is_other_player:
+	
+			#adjust for either maximizing or minimizing			
+			if not maximize:
 				if next_val < turn_val:
 					turn_val = next_val
 			else:
@@ -135,8 +141,8 @@ def minimax(args, board, symbol):
 	# the actual work
 	#TODO: test. There might be an issue where the best value is actually in the node and not the edge
 	root_node = node(None,board,0)	
-	best_val = mm_recursive(root_node,in_depth,symbol)
-	edge_list = root.edges
+	best_val = mm_recursive(root_node,in_depth,True)
+	edge_list = root_node.edges
 	for edge in edge_list:
 		if edge.end_node.heuristic==best_val:
 			return edge.label
