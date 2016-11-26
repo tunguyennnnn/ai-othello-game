@@ -16,8 +16,35 @@ def PrintUsage():
 	exit(1)
 #end PrintUsage
 
-def LaunchUIGame(cpu_player):
-	ui.main(cpu_player)
+def LaunchUIGame(cpu_player, tkroot, uiboard):
+	board = OthelloPlay()
+	human_turn = True
+	white_move = (None, None)
+	black_move = (None, None)
+	no_move = (-1, -1)
+	checkupdate(tkroot, uiboard, board.board)
+	while True:
+		while human_turn:
+			if uiboard.human_play:
+				(row, col) = uiboard.human_play
+				board.add_to_board(board.black, row, col)
+				checkupdate(board.board)
+				board.printout()
+				human_turn = False
+			else: 
+				sleep(2000)
+		white_move = cpu_player.play(board.serialize())
+		if white_move != no_move:
+			(row, col) = white_move
+			board.add_to_board(board.white, row, col) # TODO: make a method in board
+			checkupdate(tkroot, uiboard, board.board)
+			board.printout()
+		human_turn = True
+	cereal = board.serialize()
+	print(cereal)
+	print("Game Over")
+
+
 #end 
 
 def LaunchBotGame(black_player,white_player, tkroot, uiboard):
@@ -31,7 +58,6 @@ def LaunchBotGame(black_player,white_player, tkroot, uiboard):
 	checkupdate(tkroot, uiboard, board.board)
 	#TODO: modify and flip the board pieces after each move
 	while(black_move!=pass_move and white_move!=pass_move):
-		board.printout()
 		# black moves first
 		black_move = black_player.play(board.serialize())
 		print "B: %s" % (str(black_move))
@@ -90,7 +116,7 @@ def main(args):
 		uiboard = GameBoard(root, True)
 		uiboard.pack(side="top", fill="both", expand="true", padx=4, pady=4)
 		uiboard.currentStatus("black", 0, 0)
-		LaunchUIGame(white)
+		root.after(1000, LaunchUIGame, white, root, uiboard)
 	elif num_args==2:
 		print("Launching AI v. AI game")
 		white = CPU_Player('W',args[0])

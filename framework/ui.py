@@ -16,6 +16,7 @@ class GameBoard(tk.Frame):
         self.blackImage = tk.PhotoImage(file=os.path.join(os.getcwd(),"black.gif"))
         self.whiteImage = tk.PhotoImage(file=os.path.join(os.getcwd(),"white.gif"))
         self.pieces = {}
+        self.human_play = None
         canvas_width = columns * size + 30
         canvas_height = rows * size + 100
         tk.Frame.__init__(self, parent)
@@ -30,7 +31,7 @@ class GameBoard(tk.Frame):
         	self.canvas.bind("<Button-1>", self.clickHandler)
 
     def clickHandler(self, event):
-        if not play_board:
+        if not self.human_play:
             x , y = event.x, event.y
             row = col = 0
             for r in range(self.rows):
@@ -42,7 +43,7 @@ class GameBoard(tk.Frame):
                     col = c
                     break
             self.addBlack(col, row)
-            play_board = "%d %d" %(col, row)
+            self.human_play = (col, row)
 
 
     def addBlack(self, row=0, column = 0):
