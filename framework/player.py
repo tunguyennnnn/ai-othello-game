@@ -54,7 +54,7 @@ class CPU_Player(Player):
 		try:
 			retVal=tuple([int(x) for x in response])
 			assert len(retVal)==2
-		except ValueError,e:
+		except Exception,e:
 			print("CPU_Player Interaction ERROR")
 			print(e)
 			print("Process provided wrong output. Check command args or provision your program")

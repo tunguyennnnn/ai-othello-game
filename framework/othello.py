@@ -6,11 +6,38 @@ class OthelloPlay:
         self.black = "B"
         self.white = "W"
         self.empty = "_"
+        self.directions = ((-1,+1),(-1,0),(-1,-1),(0,+1),(0,-1),(+1,+1),(+1,0),(+1,-1))
         #self.board = [self.empty for i in range(64)] #middle
         #hard coded start state
         self.board = [['_', '_', '_', '_', '_', '_', '_', '_'], ['_', '_', '_', '_', '_', '_', '_', '_'], ['_', '_', '_', '_', '_', '_', '_', '_'], ['_', '_', '_', 'W', 'B', '_', '_', '_'], ['_', '_', '_', 'B', 'W', '_', '_', '_'], ['_', '_', '_', '_', '_', '_', '_', '_'], ['_', '_', '_', '_', '_', '_', '_', '_'], ['_', '_', '_', '_', '_', '_', '_', '_']]
         #self.board[27] = self.board[36] = "B"
         #self.board[28] = self.board[35] = "W"
+
+    def add_to_board(self, type, row, col):
+    	#should have check correct move
+        self.board[row][col] = type
+        self.flip_moves(type, row, col)
+
+    def flip_moves(self, type, row, column):
+    	for (row_adder, column_adder) in self.directions:
+    		other_end = self.find_bracket(type, row + row_adder, column + column_adder, row_adder, column_adder)
+    		if other_end:
+    			(row_end, col_end) = other_end
+    			copy_row, copy_col = row, column
+    			while not (copy_row == row_end and copy_col == col_end):
+    				copy_row += row_adder
+    				copy_col += column_adder
+    				self.board[copy_row][copy_col] = type
+
+    def find_bracket(self,type, row, col, row_dir, col_dir):
+    	if row < 0 or row > 7 or col > 7  or col < 0 or self.board[row][col] == self.empty:
+    		return None
+    	else:
+    		if type == self.board[row][col]:
+    			return (row, col)
+    		else:
+    			return self.find_bracket(type, row + row_dir, col + col_dir, row_dir, col_dir)
+
 
     def print_board(self):
         for i in range(8):
@@ -46,16 +73,5 @@ class OthelloPlay:
         else:
             return self.black
             
-    def to_lisp_board(self, symbol = "B", depth=3,  board = None):
-        if not board:
-            board = self.board
-        string_board = "%s %d" %(symbol, depth)
-        for item in board:
-            string_board += ' %s' %item
-        return string_board
 
-    def play_game(self, black_command = [], white_command = [], depth = 3):
-        process = sb.Popen(black_command, stdin = sb.PIPE, stdout = sb.PIPE, stderr = sb.PIPE, bufsize = 0)
-        print process.communicate(self.to_lisp_board())
-        return process#end class Board
 #end OthelloPlay

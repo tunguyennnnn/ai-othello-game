@@ -6,7 +6,8 @@ import time
 
 from othello import OthelloPlay
 from player import *
-import ui
+from ui import *
+import Tkinter as tk
 
 def PrintUsage():
 	print("TJ Othello Engine - Usage:")
@@ -19,7 +20,7 @@ def LaunchUIGame(cpu_player):
 	ui.main(cpu_player)
 #end 
 
-def LaunchBotGame(black_player,white_player):
+def LaunchBotGame(black_player,white_player, tkroot, uiboard):
 	"""
 	Manages a game between two AI Agents
 	"""
@@ -27,6 +28,7 @@ def LaunchBotGame(black_player,white_player):
 	black_move = (None,None)
 	white_move = (None,None)
 	pass_move = (-1,-1)
+	checkupdate(tkroot, uiboard, board.board)
 	#TODO: modify and flip the board pieces after each move
 	while(black_move!=pass_move and white_move!=pass_move):
 		board.printout()
@@ -34,16 +36,21 @@ def LaunchBotGame(black_player,white_player):
 		black_move = black_player.play(board.serialize())
 		print "B: %s" % (str(black_move))
 		if black_move!=pass_move:
-			board.board[black_move[0]][black_move[1]]=board.black # TODO: make a method in board
+			(row, col) = black_move
+			board.add_to_board(board.black, row, col)   # TODO: make a method in board
+			checkupdate(tkroot, uiboard, board.board)
+			board.printout()
 		time.sleep(1)
 		cereal = board.serialize()
 
-		board.printout()
 		# white moves second
 		white_move = white_player.play(board.serialize())
 		print "W: %s" % (str(white_move))
 		if white_move!=pass_move:
-			board.board[white_move[0]][white_move[1]]=board.white # TODO: make a method in board
+			(row, col) = white_move
+			board.add_to_board(board.white, row, col) # TODO: make a method in board
+			checkupdate(tkroot, uiboard, board.board)
+			board.printout()
 		time.sleep(1)
 	#end while
 	
@@ -52,24 +59,53 @@ def LaunchBotGame(black_player,white_player):
 	print("Game Over")
 #end LauchBotGame
 
+def checkupdate(root, board, play_board):
+	print play_board
+	black_count = white_count = 0;
+	board.canvas.delete("piece")
+	for (row, sublist) in zip(range(8), play_board):
+		for (col, player_type) in zip(range(8), sublist):
+			if player_type == "B":
+				black_count += 1
+				board.addBlack(col, row)
+			elif player_type == "W":
+				white_count += 1
+				board.addWhite(col, row)
+	board.currentStatus("B", black_count, white_count)
+	root.update()
+
+#call back: after the ui board is generated
+
 def main(args):
 	""" Check the arguments and control the flow"""
 	#check arguments
 	num_args = len(args)
+
+	# generate ui config:
+	root = tk.Tk()
+	uiboard = None
 	if num_args==1:
 		print("Launching Player v. PC game")
 		white = CPU_Player('W',args[0])
+		uiboard = GameBoard(root, True)
+		uiboard.pack(side="top", fill="both", expand="true", padx=4, pady=4)
+		uiboard.currentStatus("black", 0, 0)
 		LaunchUIGame(white)
 	elif num_args==2:
 		print("Launching AI v. AI game")
 		white = CPU_Player('W',args[0])
 		black = CPU_Player('B',args[1])
-		LaunchBotGame(black,white)
+		uiboard = GameBoard(root)
+		uiboard.pack(side="top", fill="both", expand="true", padx=4, pady=4)
+		uiboard.currentStatus("black", 0, 0)
+		root.after(1000, LaunchBotGame, black, white, root, uiboard)
 	else:
 		print("Error with arguments!")
 		PrintUsage()
 
-
+	#start the game
+	if uiboard:
+		root.mainloop()
 	print "Ending..."
 #end main
 

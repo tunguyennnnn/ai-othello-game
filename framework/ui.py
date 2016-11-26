@@ -5,9 +5,10 @@ from multiprocessing import *
 from time import sleep
 
 from othello import OthelloPlay
+from main import *
 
 class GameBoard(tk.Frame):
-    def __init__(self, parent, rows=8, columns=8, size=64):
+    def __init__(self, parent, play_with_human=False, rows=8, columns=8, size=64):
         '''size is the size of a square, in pixels'''
         self.rows = rows
         self.columns = columns
@@ -25,10 +26,10 @@ class GameBoard(tk.Frame):
         # this binding will cause a refresh if the user interactively
         # changes the window size
         self.canvas.bind("<Configure>", self.refresh)
-        self.canvas.bind("<Button-1>", self.clickHandler)
+        if play_with_human:
+        	self.canvas.bind("<Button-1>", self.clickHandler)
 
     def clickHandler(self, event):
-        global play_board
         if not play_board:
             x , y = event.x, event.y
             row = col = 0
@@ -105,83 +106,6 @@ class GameBoard(tk.Frame):
         self.addWhite(4,4)
         root.mainloop()
 
-play_board = None
-is_drawing_board = False
 
 
-def checkupdate(root, board):
-    global play_board
-    if type(play_board) is list:
-        copy_board = play_board[:]
-        play_board = None
-        board.canvas.delete("piece")
-        black_count = white_count = 0;
-        for (row, sublist) in zip(range(8), copy_board):
-            for (col, player_type) in zip(range(8), sublist):
-                if player_type == "B":
-                    black_count += 1
-                    board.addBlack(row, col)
-                elif player_type == "W":
-                    white_count += 1
-                    board.addWhite(row, col)
-        board.currentStatus("B", black_count, white_count)
-        root.update()
-    else:
-        print "waiting"
-    root.after(2000, checkupdate, root, board)
-#end checkupdate
 
-def play_in_thread(player,game_board):
-	#TODO: game_board is OthelloPlay type
-	#Play forever
-	global play_board
-	global is_drawing_board
-	print("CPU Player started")
-	while is_drawing_board:
-		while play_board is list:
-			if not is_drawing_board:
-				exit(0)
-			print("cpu is waiting")
-			sleep(1)
-		
-		# Three cases in control flow
-		
-		#play a move and sleep for a bit
-		# Need to pass the board state
-		play_board = player.play(game_board.serialize())
-		print(play_board)
-		sleep(2)
-	#end while true
-#end play_in_thread
-
-def main(player_in):   
-    global is_drawing_board    
-    root = tk.Tk()
-    board = GameBoard(root)
-    board.pack(side="top", fill="both", expand="true", padx=4, pady=4)
-    player1 = tk.PhotoImage(file="black.gif")
-    board.addWhite(3,4)
-    board.addWhite(4,3)
-    board.addBlack(3,3)
-    board.addBlack(4,4)
-    board.currentStatus("black", 0, 0)
-    root.after(2000, checkupdate, root, board)
-    
-    cpu_player_thread = Thread()
-    if player_in is not None:
-        #Put it in a thread
-        game_board = OthelloPlay()
-    	cpu_player_thread = Thread(target=play_in_thread,args=(player_in,game_board))
-    is_drawing_board = True
-    cpu_player_thread.start()    
-    root.mainloop()
-    is_drawing_board = False
-    # Join and kill the CPU Player if mainloop is done
-    try:
-    	cpu_player_thread.join(1)
-    except Exception,e:
-    	exit(0)
-#end main
-
-if __name__ == "__main__":
-    main(None)
