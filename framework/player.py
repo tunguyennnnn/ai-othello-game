@@ -23,12 +23,12 @@ class CPU_Player(Player):
 		self.command=shlex.split(calling_command)
 		self.process = None
 		self.persistent = keep_alive
-		
+
 		self.STDIN=IN
 		self.STDOUT=OUT
 		self.STDERR=ERR
 	#end init
-	
+
 	def play(self,serialized_board):
 		"""Sends a serialized board to the process and returns a tuple with the move"""
 		# Cleanup any old processes
@@ -36,19 +36,19 @@ class CPU_Player(Player):
 			while(self.process.poll() is None):
 				self.process.kill()
 		# end cleanup
-		
+
 		# open it up and start a timer
 		self.process = self.spawn(self.command, stdin=self.STDIN,stdout=self.STDOUT,stderr=self.STDERR)
 		watchdog = Timer(self.timeout,self.process.kill)
 		watchdog.start()
 		raw_reply = self.process.communicate(serialized_board)
-		
+
 		if watchdog.is_alive():
 			watchdog.cancel()
 		else:
 			sys.stderr.write("Process timed out! That's a pass")
 			return (-1,-1)
-			
+
 		response = raw_reply[0].strip().split()
 		retVal=(-1,-1)
 		try:
@@ -65,5 +65,5 @@ class CPU_Player(Player):
 
 		return retVal
 	#end play
-	
+
 #end CPUPlayer

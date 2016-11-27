@@ -15,8 +15,22 @@ class OthelloPlay:
 
     def add_to_board(self, type, row, col):
     	#should have check correct move
-        self.board[row][col] = type
-        self.flip_moves(type, row, col)
+        if self.is_valid_move(type, row, col):
+            self.board[row][col] = type
+            self.flip_moves(type, row, col)
+            return True
+        else:
+            return False
+    def is_legal_move(self, row, col):
+        return row >= 0 and row <= 7 and col <= 7  and col >= 0
+
+    def is_valid_move(self, type, row, col):
+        if self.board[row][col] == self.empty:
+            for (row_dir, col_dir) in self.directions:
+                print row_dir, col_dir, self.is_legal_move(row + row_dir, col + col_dir), self.find_bracket(type, row + row_dir + row_dir, col + col_dir + col_dir, row_dir, col_dir)
+                if self.is_legal_move(row + row_dir, col + col_dir) and self.board[row + row_dir][col + col_dir] == self.opponent(type) and self.find_bracket(type, row + row_dir + row_dir, col + col_dir + col_dir, row_dir, col_dir):
+                    return True
+        return False
 
     def flip_moves(self, type, row, column):
     	for (row_adder, column_adder) in self.directions:
@@ -30,7 +44,7 @@ class OthelloPlay:
     				self.board[copy_row][copy_col] = type
 
     def find_bracket(self,type, row, col, row_dir, col_dir):
-    	if row < 0 or row > 7 or col > 7  or col < 0 or self.board[row][col] == self.empty:
+    	if (not self.is_legal_move(row, col)) or self.board[row][col] == self.empty:
     		return None
     	else:
     		if type == self.board[row][col]:
@@ -45,7 +59,7 @@ class OthelloPlay:
                 print repr(self.board[i*8 + j]).rjust(1),
             print ''
         print "Current count: B: %d ---- W: %d" %(self.count_difference("b"), self.count_difference('w'))
-        
+
     def serialize(self):
 	cereal = []
 	for row in self.board:
@@ -53,8 +67,8 @@ class OthelloPlay:
 	#end for
 	cereal = "(("+")(".join(cereal)+"))"
 	return cereal
-	
-    def printout(self):	
+
+    def printout(self):
 	"""
 	Pretty-prints the board onto the terminal
 	"""
@@ -72,6 +86,6 @@ class OthelloPlay:
             return self.white
         else:
             return self.black
-            
+
 
 #end OthelloPlay

@@ -16,36 +16,8 @@ def PrintUsage():
 	exit(1)
 #end PrintUsage
 
-def LaunchUIGame(cpu_player, tkroot, uiboard):
-	board = OthelloPlay()
-	human_turn = True
-	white_move = (None, None)
-	black_move = (None, None)
-	no_move = (-1, -1)
-	checkupdate(tkroot, uiboard, board.board)
-	while True:
-		while human_turn:
-			if uiboard.human_play:
-				(row, col) = uiboard.human_play
-				board.add_to_board(board.black, row, col)
-				checkupdate(board.board)
-				board.printout()
-				human_turn = False
-			else: 
-				sleep(2000)
-		white_move = cpu_player.play(board.serialize())
-		if white_move != no_move:
-			(row, col) = white_move
-			board.add_to_board(board.white, row, col) # TODO: make a method in board
-			checkupdate(tkroot, uiboard, board.board)
-			board.printout()
-		human_turn = True
-	cereal = board.serialize()
-	print(cereal)
-	print("Game Over")
-
-
-#end 
+def LaunchUIGame(cpu_player, tkroot, uiboard, human_play=True):
+	pass
 
 def LaunchBotGame(black_player,white_player, tkroot, uiboard):
 	"""
@@ -55,7 +27,7 @@ def LaunchBotGame(black_player,white_player, tkroot, uiboard):
 	black_move = (None,None)
 	white_move = (None,None)
 	pass_move = (-1,-1)
-	checkupdate(tkroot, uiboard, board.board)
+	uiboard.update_board(board.board)
 	#TODO: modify and flip the board pieces after each move
 	while(black_move!=pass_move and white_move!=pass_move):
 		# black moves first
@@ -63,8 +35,8 @@ def LaunchBotGame(black_player,white_player, tkroot, uiboard):
 		print "B: %s" % (str(black_move))
 		if black_move!=pass_move:
 			(row, col) = black_move
-			board.add_to_board(board.black, row, col)   # TODO: make a method in board
-			checkupdate(tkroot, uiboard, board.board)
+			print board.add_to_board(board.black, row, col)
+			uiboard.update_board(board.board)
 			board.printout()
 		time.sleep(1)
 		cereal = board.serialize()
@@ -74,19 +46,18 @@ def LaunchBotGame(black_player,white_player, tkroot, uiboard):
 		print "W: %s" % (str(white_move))
 		if white_move!=pass_move:
 			(row, col) = white_move
-			board.add_to_board(board.white, row, col) # TODO: make a method in board
-			checkupdate(tkroot, uiboard, board.board)
+			print board.add_to_board(board.white, row, col)
+			uiboard.update_board(board.board)
 			board.printout()
 		time.sleep(1)
 	#end while
-	
+
 	cereal = board.serialize()
 	print(cereal)
 	print("Game Over")
 #end LauchBotGame
 
 def checkupdate(root, board, play_board):
-	print play_board
 	black_count = white_count = 0;
 	board.canvas.delete("piece")
 	for (row, sublist) in zip(range(8), play_board):
@@ -113,10 +84,9 @@ def main(args):
 	if num_args==1:
 		print("Launching Player v. PC game")
 		white = CPU_Player('W',args[0])
-		uiboard = GameBoard(root, True)
+		uiboard = GameBoard(root, white)
 		uiboard.pack(side="top", fill="both", expand="true", padx=4, pady=4)
 		uiboard.currentStatus("black", 0, 0)
-		root.after(1000, LaunchUIGame, white, root, uiboard)
 	elif num_args==2:
 		print("Launching AI v. AI game")
 		white = CPU_Player('W',args[0])

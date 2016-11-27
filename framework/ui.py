@@ -1,22 +1,20 @@
 import Tkinter as tk
-from threading import Thread
 import os
-from multiprocessing import *
 from time import sleep
-
 from othello import OthelloPlay
-from main import *
+from player import *
 
 class GameBoard(tk.Frame):
-    def __init__(self, parent, play_with_human=False, rows=8, columns=8, size=64):
+    def __init__(self, parent, cpu_player = None, rows=8, columns=8, size=64):
         '''size is the size of a square, in pixels'''
         self.rows = rows
+        self.root = parent
         self.columns = columns
         self.size = size
         self.blackImage = tk.PhotoImage(file=os.path.join(os.getcwd(),"black.gif"))
         self.whiteImage = tk.PhotoImage(file=os.path.join(os.getcwd(),"white.gif"))
         self.pieces = {}
-        self.human_play = None
+        self.human_play = True
         canvas_width = columns * size + 30
         canvas_height = rows * size + 100
         tk.Frame.__init__(self, parent)
@@ -27,12 +25,16 @@ class GameBoard(tk.Frame):
         # this binding will cause a refresh if the user interactively
         # changes the window size
         self.canvas.bind("<Configure>", self.refresh)
-        if play_with_human:
-        	self.canvas.bind("<Button-1>", self.clickHandler)
+        if cpu_player:
+            self.cpu_player = cpu_player
+            self.gameboard = OthelloPlay()
+            self.update_board(self.gameboard.board)
+            self.wrong_counter = 0
+            self.canvas.bind("<Button-1>", self.clickHandler)
 
     def clickHandler(self, event):
-        if not self.human_play:
-            x , y = event.x, event.y
+        if self.human_play:
+            x, y = event.x, event.y
             row = col = 0
             for r in range(self.rows):
                 if (r + 1)*self.size >= x:
@@ -42,8 +44,48 @@ class GameBoard(tk.Frame):
                 if (c+1)*self.size  >= y:
                     col = c
                     break
-            self.addBlack(col, row)
-            self.human_play = (col, row)
+            if self.gameboard.add_to_board(self.gameboard.black, row, col):
+                self.update_board(self.gameboard.board)
+                self.gameboard.printout()
+                self.human_play = False
+                cpu_move = self.cpu_player.play(self.gameboard.serialize())
+                print cpu_move
+                if not cpu_move == (-1,-1):
+                    (row, col) = cpu_move
+                    self.gameboard.add_to_board(self.gameboard.white, row, col)
+                    self.update_board(self.gameboard.board)
+                self.gameboard.printout()
+                self.human_play = True
+                self.wrong_counter = 0
+            else:
+                if self.wrong_counter < 2:
+                    self.wrong_counter += 1
+                    self.currentStatus("You have played an illegal moved, please play gain")
+                else:
+                    cpu_move = self.cpu_player.play(self.gameboard.serialize())
+                    print cpu_move
+                    if not cpu_move == (-1,-1):
+                        (row, col) = cpu_move
+                        self.gameboard.add_to_board(self.gameboard.white, row, col)
+                        self.update_board(self.gameboard.board)
+                    self.gameboard.printout()
+                    self.human_play = True
+                    self.wrong_counter = 0
+
+
+    def update_board(self, play_board):
+        black_count = white_count = 0;
+    	self.canvas.delete("piece")
+    	for (row, sublist) in zip(range(8), play_board):
+    		for (col, player_type) in zip(range(8), sublist):
+    			if player_type == "B":
+    				black_count += 1
+    				self.addBlack(col, row)
+    			elif player_type == "W":
+    				white_count += 1
+    				self.addWhite(col, row)
+    	self.currentStatus("B", black_count, white_count)
+    	self.root.update()
 
 
     def addBlack(self, row=0, column = 0):
@@ -106,7 +148,3 @@ class GameBoard(tk.Frame):
         self.addWhite(3,3)
         self.addWhite(4,4)
         root.mainloop()
-
-
-
-
