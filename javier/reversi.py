@@ -92,10 +92,19 @@ def valid_moves(board_state, color_symbol):
 	def slice_and_check(x,y,direction):
 		#slice
 		single = slice_board(board_state,direction,x,y)
-		retVal = color_symbol in single
-	
-		#if retVal:
-				#print(str(direction)+"->"+str(single))
+		single = single[1:]
+		retVal = False
+		partials=0
+		for symbol in single:
+			# Nothing to flip
+			if symbol==empty:
+				break
+			if symbol==other_symbol:
+				partials+=1
+			if symbol==color_symbol:
+				retVal=True
+				break
+		#end for symbol
 	
 		return retVal
 	#end inner slice_and_check
@@ -109,9 +118,9 @@ def valid_moves(board_state, color_symbol):
 	counter_symbols = []
 	for i in range(8):
 		row = board_state[i]
-		row_pieces = [(x,i) for x in range(8) if row[x]==color_symbol]
+		row_pieces = [(i,x) for x in range(8) if row[x]==color_symbol]
 		own_symbols.extend(row_pieces)
-		row_pieces = [(x,i) for x in range(8) if row[x]==other_symbol]
+		row_pieces = [(i,x) for x in range(8) if row[x]==other_symbol]
 		counter_symbols.extend(row_pieces)
 	#end for
 	
@@ -173,8 +182,8 @@ def play_move(board,move,color_symbol):
 	Returns a modified version of the original board with the move having been played
 	"""
 	# Copy the board and actually play the move
-	print "playing %s on %s" % (color_symbol,str(move))
-	print_board(board)
+	#print "playing %s on %s" % (color_symbol,str(move))
+	#print_board(board)
 	next_board = copy.deepcopy(board)
 	x = move[0]
 	y = move[1]
@@ -189,7 +198,7 @@ def play_move(board,move,color_symbol):
 		# slice the board in a single dimension
 		single_dimension = get_sliced_coords(board,direction,x,y)
 		single_dimension = single_dimension[1:]
-		print(single_dimension)
+		#print(single_dimension)
 		stop_idx = 0
 		is_valid = False
 		# Check when to stop
@@ -210,14 +219,14 @@ def play_move(board,move,color_symbol):
 		if stop_idx>0 and stop_idx<7 and is_valid:
 			for i in range(stop_idx+1):
 				move = single_dimension[i]
-				print "flipped %s" % (str(move))
+				#print "flipped %s" % (str(move))
 				next_board[move[0]][move[1]] = color_symbol
 			#end for stop_idx
 		#end if
 	#end for directions
 	
-	print_board(next_board)
-	print "moved played"
+	#print_board(next_board)
+	#print "moved played"
 	# return the modified board
 	return next_board
 #end play_move

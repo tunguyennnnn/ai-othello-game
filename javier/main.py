@@ -30,10 +30,10 @@ def main(args):
 	
 	keep_alive=False
 	board_state = ""
-	if keep_alive:
-		print "Ready to play as %s" % args[0]
-	#TODO: Remove when finished
-	start = time.time()
+	#if keep_alive:
+		#print "Ready to play as %s" % args[0]
+	
+	#start = time.time()
 	#Game loop
 	while(True):
 		current_board = raw_input()  # Read STDIN
@@ -43,13 +43,13 @@ def main(args):
 		# agents expect arguments to be passed in as (args, board,symbol)
 		move = agent(agent_args, current_board, color)
 		#print reversi.check_flip_num(current_board,move,color)
-		print "%d %d" % move  # put a move in STDOUT
+		print "%d %d" % (move[0],move[1])  # put a move in STDOUT
 		
 		if not keep_alive or reversi.is_game_over(next_state):
 			break
 	#end while
-	#TODO: Remove when finished
-	sys.stderr.write(str(time.time()-start)+"\n")
+	
+	#sys.stderr.write(str(time.time()-start)+"\n")
 #end main
 	
 if __name__=="__main__":

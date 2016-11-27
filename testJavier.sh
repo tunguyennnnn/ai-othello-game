@@ -7,5 +7,5 @@ TEST_C="minimax 4"
 
 BLACK_TEST=$TEST_A
 WHITE_TEST=$TEST_A
-
-python framework/main.py "python -u javier/main.py W $WHITE_TEST" "python -u javier/main.py B $BLACK_TEST"
+cd framework
+python main.py "python -u ../javier/main.py W $WHITE_TEST" "python -u ../javier/main.py B $BLACK_TEST"

@@ -64,7 +64,7 @@ def greedy(args, board, symbol):
 
 def minimax(args, board, symbol):
 	"""
-	TODO: Complete the minimax function. This will not work as it is
+	Minimax agent that finds the best possible move if the opponent plays optimally
 	"""
 	# One-time runtime check
 	if(len(args)<1):
@@ -87,7 +87,7 @@ def minimax(args, board, symbol):
 			maxSymbol=counterpart(maxSymbol)
 
 		moves = reversi.valid_moves(start.value,maxSymbol)
-		print "max:%s maxSymbol:%s moves:%s" % (str(maximize),maxSymbol,str(moves))
+		#print "max:%s maxSymbol:%s moves:%s" % (str(maximize),maxSymbol,str(moves))
 		# Out of depth
 		if depth<1:
 			# deal with end games
@@ -106,7 +106,7 @@ def minimax(args, board, symbol):
 				update_val = -update_val
 			if start.root!=None:
 				start.root.heuristic=update_val
-			print(("="*8)+"MAX DEPTH"+("="*8))
+			#print(("="*8)+"MAX DEPTH"+("="*8))
 			return update_val
 		#end if depth
 			
@@ -116,8 +116,8 @@ def minimax(args, board, symbol):
 			# Play the move, make a new board, call recursively
 			#print(start)
 			next_board = reversi.play_move(copy.deepcopy(start.value),a_move,maxSymbol)
-			print "%s : %s" % (maxSymbol,str(a_move))
-			reversi.print_board(next_board)
+			#print "%s : %s" % (maxSymbol,str(a_move))
+			#reversi.print_board(next_board)
 			next_node = node(start,next_board,0)
 			start.add_child(next_node,0,a_move)
 			#print(start.edges)

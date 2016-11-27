@@ -38,7 +38,7 @@ def LaunchBotGame(black_player,white_player, tkroot, uiboard):
 			print board.add_to_board(board.black, row, col)
 			uiboard.update_board(board.board)
 			board.printout()
-		time.sleep(1)
+		time.sleep(2)
 		cereal = board.serialize()
 
 		# white moves second
@@ -49,7 +49,7 @@ def LaunchBotGame(black_player,white_player, tkroot, uiboard):
 			print board.add_to_board(board.white, row, col)
 			uiboard.update_board(board.board)
 			board.printout()
-		time.sleep(1)
+		time.sleep(2)
 	#end while
 
 	cereal = board.serialize()
