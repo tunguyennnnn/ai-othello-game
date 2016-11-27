@@ -68,7 +68,7 @@ def checkupdate(root, board, play_board):
 			elif player_type == "W":
 				white_count += 1
 				board.addWhite(col, row)
-	board.currentStatus("B", black_count, white_count)
+	board.currentStatus("playing", black_count, white_count)
 	root.update()
 
 #call back: after the ui board is generated
