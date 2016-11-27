@@ -27,7 +27,6 @@ class OthelloPlay:
     def is_valid_move(self, type, row, col):
         if self.board[row][col] == self.empty:
             for (row_dir, col_dir) in self.directions:
-                print row_dir, col_dir, self.is_legal_move(row + row_dir, col + col_dir), self.find_bracket(type, row + row_dir + row_dir, col + col_dir + col_dir, row_dir, col_dir)
                 if self.is_legal_move(row + row_dir, col + col_dir) and self.board[row + row_dir][col + col_dir] == self.opponent(type) and self.find_bracket(type, row + row_dir + row_dir, col + col_dir + col_dir, row_dir, col_dir):
                     return True
         return False

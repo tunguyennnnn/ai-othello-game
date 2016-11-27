@@ -1,21 +1,26 @@
 (require :the-game)
 
-		
-(defun play-game (strat1 strat2)	
+;; for testing the agents -> s
+(defun play-game (agent1 agent2)	
 	(let ((board (init-board))
 		  (current-player black))
 		(while current-player
-			(display-board board)
 			(let ((next-move (funcall
-									strat1
+									(if (equalp current-player black)
+										agent1
+										agent2)
 									 current-player									
 									 board 
 									 )))
+				(print next-move)
 				(setf board (make-move next-move current-player board))
-				(setf current-player (next-to-play board current-player))))
+				(setf current-player (next-to-play board current-player))
+				(display-board board)
+				(print (equalp current-player black))))
 		))
 								
-	
+
+;;determined which one can play next -> cover case when a player cannot make a move
 (defun next-to-play (board previous-type)
 	(let ((opp (opponent previous-type)))
 		(cond ((any-legal-move? opp board) opp)
@@ -49,7 +54,7 @@
 
 
 (defun othello-play (type depth input)
-	(let* ((strat (alpha-beta 3 #'get-difference))
+	(let* ((strat (alpha-beta 3 #'predetermined-score-sum-agent))
 		  (my-pos (funcall strat type input)))
 		(if my-pos 
 			(multiple-value-bind (col row) (floor my-pos 10)
@@ -62,11 +67,12 @@
 	(setf a (read-line)))
 
 
+(if (eql (length *args*) 0)
+	(let ((strat1 (alpha-beta 3 #'get-difference))
+		 (strat2 (alpha-beta 3 #'predetermined-score-sum-agent)))
+		(play-game strat1 strat2))
+	(progn 
+		(storing)
+		(othello-play (car *args*) (cadr *args*) (translate-board a))))
 
-;(let ((strat1 (alpha-beta 3 #'get-difference))
-;	  (strat2 (alpha-beta 3 #'get-sum-score)))
-;	(play-game strat1 strat2))
-;(othello-play (split-str (car *args*)))
-(storing)
-(othello-play (car *args*) (cadr *args*) (translate-board a))
 
