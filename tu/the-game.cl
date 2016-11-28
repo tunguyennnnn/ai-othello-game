@@ -170,7 +170,7 @@
 		(+ score (get-difference type board))))
 
 
-;;; get neighbors of the corner
+;;; get neighbors of the corner 
 (defun corner-adjacents (corner)
 	(case corner
 		(11 '(12 21 22))
@@ -178,7 +178,9 @@
 		(81 '(82 72 71))
 		(88 '(78 77 87))))
 
-
+;;; this agent does some analyzing to the board:
+;;; if player takes corner already at any adjacent positions to the corner, if one of them is ocuppied
+;;; then it is more incentive for the player to takes play next to those adjacents 
 (defun predetermined-score-sum-agent (type board)
 	(let ((score (get-sum-score type board)))
 		(dolist (corner '(11 18 81 88))
@@ -191,28 +193,30 @@
 		score))
 
 
-(defun alpha-beta-helper (type board max min depth eval-func)
-	(if (eql depth 0) ;;reach depth -> evaluate the 
+;;; alpha beta function -->calling alpha-beta with the heuristic function to get the best move, return Null if there is no move
+(defun alpha-beta (depth eval-fn)
+	#'(lambda (type board)
+		(multiple-value-bind (value move)
+			(alpha-beta-helper type board losing-value winning-value
+					depth eval-fn) 
+		move)))
+
+;;;; helper to alpha-beta : does actual job of exploring the game:
+(defun alpha-beta-helper (type board max min depth eval-func) ;;; max is the reachable score, and min is the higher limit to prune the branches
+	(if (eql depth 0) ;;reach depth -> evaluate the score
 		(funcall eval-func type board)
-		(let ((possible-positions (legal-pos type board)))
-			(if (null possible-positions) ;; if there no moves can be mad -> find if opponent can move
+		(let ((possible-positions (legal-pos type board))) 
+			(if (null possible-positions) ;; if there no moves can be made -> find if opponent can move and continue explore
 				(if (any-legal-move? (opponent type) board)
-					(- (alpha-beta-helper (opponent type) board (- min) (- max) (1- depth) eval-func))
-					(final-value type board))
-				(let ((chosen-pos (first possible-positions)))
-					(dolist (pos possible-positions)
-						(if (>= max min)
+					(- (alpha-beta-helper (opponent type) board (- min) (- max) (1- depth) eval-func)) ;;; <--- this is opponent moves
+					(final-value type board)) ;;; this case is reached when the player dont have any move as well as its opponent -> determine if its a wining or a lost
+				(let ((chosen-pos (first possible-positions))) ;;if there is move 
+					(dolist (pos possible-positions) ;;; for all the legal moves:
+						(if (>= max min) ;;; if score achieved is greater than the limit -> prunt it by returing 
 							(return)
-							(let ((board-after-play (make-move pos type (copy-board board))))
-								(let ((val (- (alpha-beta-helper (opponent type) board-after-play (- min) (- max) (1- depth) eval-func))))
-									(when (> val max)
+							(let ((board-after-play (make-move pos type (copy-board board)))) ;; otherwise exploring the game with depths
+								(let ((val (- (alpha-beta-helper (opponent type) board-after-play (- min) (- max) (1- depth) eval-func)))) ;; start with opponent first
+									(when (> val max) ;; at the branch level -> if get better results -> updating the max to new value
 										(setf chosen-pos pos max val))))))
 					(values max chosen-pos))))))
 
-
-(defun alpha-beta (depth eval-fn)
-  #'(lambda (type board)
-      (multiple-value-bind (value move)
-          (alpha-beta-helper type board losing-value winning-value
-                      depth eval-fn) 
-        move)))
