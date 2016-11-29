@@ -40,7 +40,7 @@ def NoCorners(board, moves, color):
 	"""
 	Assesses the best strategy to win the game by avoiding high risk areas and taking corners
 	"""
-	risk_val = -5
+	risk_val = -15
 	max_risk = set([(1,1),(1,6),(6,1),(6,6)])
 	mid_risk = set([(1,2),(1,3),(1,4),(1,5),(6,2),(6,3),(6,4),(6,5),(2,1),(3,1),(4,1),(5,1),(2,6),(3,6),(4,6),(5,6)])
 	
