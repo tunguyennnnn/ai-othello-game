@@ -217,7 +217,8 @@
 ;;; random agent;;;;;;;;;;
 (defun random-agent (type board)
 	(let ((positions (legal-pos type board)))
-		(nth (random (length positions)) positions)))
+		(let ((el (random (length positions))))
+			(print (nth (random (length positions)) positions)))))
 
 
 ;;; greedy agent finds the place where it maximizes its score
@@ -250,11 +251,9 @@
 									 current-player									
 									 board 
 									 )))
-				(print next-move)
 				(setf board (make-move next-move current-player board))
 				(setf current-player (next-to-play board current-player))
-				(display-board board)
-				(print (equalp current-player black))))
+				(display-board board)))
 		))
 								
 
@@ -306,8 +305,8 @@
 
 
 (if (eql (length *args*) 0)
-	(let ((strat1 (alpha-beta-greedy-agent 3))
-		 (strat2 (alpha-beta-predetermined-score 3)))
+	(let ((strat1 (alpha-beta-predetermined-score 5))
+		 (strat2 (alpha-beta-greedy-agent 5)))
 		(play-game strat1 strat2))
 	(progn 
 		(storing)
